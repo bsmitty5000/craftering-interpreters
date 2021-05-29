@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SeeSharp
 {
-    enum TokenType
+    public enum TokenType
     {
         // Single-character tokens.
         LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
@@ -28,7 +28,7 @@ namespace SeeSharp
         EOF
     }
 
-    class Token
+    public class Token
     {
         // The type of this particular lexeme
         public TokenType Type { get; }

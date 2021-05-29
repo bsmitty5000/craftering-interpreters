@@ -5,4 +5,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="py -3.9 ../ExpGenerator/ExpGenerator.py" />
+  </Target>
+
 </Project>

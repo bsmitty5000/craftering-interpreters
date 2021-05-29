@@ -1,0 +1,23 @@
+using System;
+
+namespace SeeSharp.Expressions
+{
+  public class {{ exprName }} : Expr
+  {
+	{% for fieldName, fieldType in fields.items() %}
+    public {{ fieldType }} {{ fieldName }} { get; }
+	{% endfor %}
+
+    public {{ exprName }}({% for fieldName, fieldType in fields.items() %}{{ fieldType }} {{ fieldName.lower() }} {% if not loop.last %}, {% endif %}{% endfor %})
+    {
+		{% for fieldName, fieldType in fields.items() %}
+		this.{{ fieldName }} = {{ fieldName.lower() }};
+		{% endfor %}
+    }
+
+    public override T accept<T>(IExprVisitor<T> visitor)
+    {
+      return visitor.visit{{ exprName }}Expr(this);
+    }
+  }
+}
