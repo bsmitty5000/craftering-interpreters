@@ -13,7 +13,9 @@ class Expr:
         self.fields[fieldName] = fieldType
 
 env = Environment(
-    loader=FileSystemLoader(f'{BASE_DIR}/ExpGenerator/templates')
+    loader=FileSystemLoader(f'{BASE_DIR}/ExpGenerator/templates'),
+    trim_blocks = True, 
+    lstrip_blocks = True
 )
 
 exprs = []

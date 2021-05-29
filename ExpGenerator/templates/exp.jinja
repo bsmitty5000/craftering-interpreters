@@ -11,7 +11,7 @@ namespace SeeSharp.Expressions
     public {{ exprName }}({% for fieldName, fieldType in fields.items() %}{{ fieldType }} {{ fieldName.lower() }} {% if not loop.last %}, {% endif %}{% endfor %})
     {
 		{% for fieldName, fieldType in fields.items() %}
-		this.{{ fieldName }} = {{ fieldName.lower() }};
+			this.{{ fieldName }} = {{ fieldName.lower() }};
 		{% endfor %}
     }
 
