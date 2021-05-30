@@ -82,9 +82,11 @@ namespace SeeSharp
                 case '+': addToken(TokenType.PLUS); break;
                 case ';': addToken(TokenType.SEMICOLON); break;
                 case '*': addToken(TokenType.STAR); break;
+                case '?': addToken(TokenType.QUESTION_MARK); break;
+                case ':': addToken(TokenType.COLON); break;
 
-                // Two character lexemes
-                case '!':
+        // Two character lexemes
+        case '!':
                     addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                     break;
                 case '=':
