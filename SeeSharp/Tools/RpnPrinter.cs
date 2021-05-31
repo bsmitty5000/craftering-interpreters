@@ -5,29 +5,25 @@ using System.Text;
 
 namespace SeeSharp.Tools
 {
-  public class RpnPrinter : IAstVisitor<string>
+  public class RpnPrinter : IExprVisitor<string>
   {
     public string Print(Expr expr)
     {
       return expr.accept<string>(this);
     }
 
-    public string visitBinary(Binary expr)
+    public string visitBinaryExpr(Binary expr)
     {
       return parenthesize(expr.oper.Lexeme, new List<Expr> { expr.left, expr.right });
     }
 
-    public string visitExpression(Expression expr)
-    {
-      throw new NotImplementedException();
-    }
 
-    public string visitGrouping(Grouping expr)
+    public string visitGroupingExpr(Grouping expr)
     {
       return parenthesize("group", new List<Expr> { expr.expression });
     }
 
-    public string visitLiteral(Literal expr)
+    public string visitLiteralExpr(Literal expr)
     {
       if (expr.objValue == null)
       {
@@ -39,17 +35,12 @@ namespace SeeSharp.Tools
       }
     }
 
-    public string visitPrint(Print expr)
-    {
-      throw new NotImplementedException();
-    }
-
-    public string visitTernary(Ternary expr)
+    public string visitTernaryExpr(Ternary expr)
     {
       return $"{expr.ifExpr.accept(this)} ? {expr.thenExpr.accept(this)} : {expr.elseExpr.accept(this)}";
     }
 
-    public string visitUnary(Unary expr)
+    public string visitUnaryExpr(Unary expr)
     {
       return parenthesize(expr.oper.Lexeme, new List<Expr> { expr.right });
     }

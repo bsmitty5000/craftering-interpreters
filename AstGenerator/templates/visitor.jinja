@@ -2,7 +2,7 @@ using System;
 
 namespace SeeSharp.AstDefinitions
 {
-  public interface IAstVisitor<T>
+  public interface I{{ astType }}Visitor<T>
   {
 	{% for astName in astNames %}
     T visit{{ astName }}{{ astType }}({{ astName }} expr);

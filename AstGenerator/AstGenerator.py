@@ -51,12 +51,18 @@ for ast in asts:
         )
 
 template = env.get_template("visitor.jinja")
-astNames = []
-for ast in asts:
-    astNames.append(ast.name)
 
-with open(f"{outputDir}/IAstVisitor.cs", "w") as fh:
-    fh.write(template.render(
-        astNames = astNames
-        )
-    )
+astTypes = ['Stmt', 'Expr']
+
+for astType in astTypes:
+    nameList = []
+    for ast in asts:
+        if ast.astType.lower() == astType.lower():
+            nameList.append(ast.name)
+
+    with open(f"{outputDir}/I{astType}Visitor.cs", "w") as fh:
+            fh.write(template.render(
+                astType = astType,
+                astNames = nameList
+                )
+            )

@@ -15,9 +15,9 @@ namespace SeeSharp.AstDefinitions
 		{% endfor %}
     }
 
-    public override T accept<T>(IAstVisitor<T> visitor)
+    public override T accept<T>(I{{ astType }}Visitor<T> visitor)
     {
-      return visitor.visit{{ astName }}(this);
+      return visitor.visit{{ astName }}{{ astType }}(this);
     }
   }
 }

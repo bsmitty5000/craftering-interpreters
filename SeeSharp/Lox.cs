@@ -47,11 +47,11 @@ namespace SeeSharp
       Scanner scanner = new Scanner(s);
       var tokens = scanner.ScanTokens();
       Parser parser = new Parser(tokens);
-      Expr expression = parser.parse();
+      var statements = parser.parse();
 
       if (hadError) return;
 
-      interpreter.interpret(expression);
+      //interpreter.interpret(expression);
     }
 
     public static void Error(int line, string message)

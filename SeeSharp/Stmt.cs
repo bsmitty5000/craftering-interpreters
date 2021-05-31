@@ -9,6 +9,6 @@ namespace SeeSharp
 {
   public abstract class Stmt
   {
-    public abstract T accept<T>(IAstVisitor<T> visitor);
+    public abstract T accept<T>(IStmtVisitor<T> visitor);
   }
 }

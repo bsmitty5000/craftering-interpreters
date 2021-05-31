@@ -19,16 +19,15 @@ namespace SeeSharp
       this.tokens = tokens;
     }
 
-    public Expr parse()
+    public List<Stmt> parse()
     {
-      try
+      List<Stmt> statements = new List<Stmt>();
+      while(!isAtEnd())
       {
-        return expression();
+        statements.Add(statement());
       }
-      catch(ParseError)
-      {
-        return null;
-      }
+
+      return statements;
     }
 
     #region Grammar rules
@@ -53,12 +52,41 @@ namespace SeeSharp
      */
 
     private delegate Expr ruleDelegate();
+
+    // statement -> exprStmt | printStmt
+    private Stmt statement()
+    {
+      if(match(new List<TokenType>() { TokenType.PRINT }))
+      {
+        return printStatement();
+      }
+
+      return expressionStatement();
+    }
+
+    // printStatement -> "print" expression ";"
+    private Stmt printStatement()
+    {
+      Expr value = expression();
+      consume(TokenType.SEMICOLON, "Expect ';' after value.");
+      return new Print(value);
+    }
+
+    // expressionStatement -> expression ";"
+    private Stmt expressionStatement()
+    {
+      Expr value = expression();
+      consume(TokenType.SEMICOLON, "Expect ';' after value.");
+      return new Expression(value);
+    }
+
     // expression -> equality ;
     private Expr expression()
     {
       return ternary();
     }
 
+    // ternary		->	equality ("?" expression ":" ternary)? ;
     private Expr ternary()
     {
       Expr expr = equality();

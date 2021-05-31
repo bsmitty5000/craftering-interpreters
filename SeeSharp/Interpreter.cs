@@ -18,7 +18,7 @@ namespace SeeSharp
     }
 
   }
-  public class Interpreter : IAstVisitor<Object>
+  public class Interpreter : IExprVisitor<Object>
   {
 
     public void interpret(Expr expr)
@@ -33,7 +33,7 @@ namespace SeeSharp
         Lox.RuntimeError(e);
       }
     }
-    public object visitBinary(Binary expr)
+    public object visitBinaryExpr(Binary expr)
     {
       Object left = evaluate(expr.left);
       Object right = evaluate(expr.right);
@@ -91,22 +91,31 @@ namespace SeeSharp
       return null;
     }
 
-    public object visitGrouping(Grouping expr)
+    public object visitGroupingExpr(Grouping expr)
     {
       return evaluate(expr.expression);
     }
 
-    public object visitLiteral(Literal expr)
+    public object visitLiteralExpr(Literal expr)
     {
       return expr.objValue;
     }
 
-    public object visitTernary(Ternary expr)
+    public object visitTernaryExpr(Ternary expr)
     {
-      throw new NotImplementedException();
+      if(isTruthy(evaluate(expr.ifExpr)))
+      {
+        return evaluate(expr.thenExpr);
+      }
+      else
+      {
+        return evaluate(expr.elseExpr);
+      }
+
+
     }
 
-    public object visitUnary(Unary expr)
+    public object visitUnaryExpr(Unary expr)
     {
       Object right = evaluate(expr.right);
 
@@ -121,6 +130,16 @@ namespace SeeSharp
 
       // unreachable
       return null;
+    }
+
+    public object visitExpression(Expression expr)
+    {
+      throw new NotImplementedException();
+    }
+
+    public object visitPrint(Print expr)
+    {
+      throw new NotImplementedException();
     }
 
     #region Utilities
@@ -197,15 +216,6 @@ namespace SeeSharp
       return o.ToString();
     }
 
-    public object visitExpression(Expression expr)
-    {
-      throw new NotImplementedException();
-    }
-
-    public object visitPrint(Print expr)
-    {
-      throw new NotImplementedException();
-    }
     #endregion
   }
 }

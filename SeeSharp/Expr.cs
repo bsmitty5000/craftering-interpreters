@@ -9,6 +9,6 @@ namespace SeeSharp
 {
   public abstract class Expr
   {
-    public abstract T accept<T>(IAstVisitor<T> visitor);
+    public abstract T accept<T>(IExprVisitor<T> visitor);
   }
 }
