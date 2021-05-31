@@ -1,28 +1,33 @@
-﻿using System;
+﻿using SeeSharp.AstDefinitions;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using SeeSharp.Expressions;
 
 namespace SeeSharp.Tools
 {
-  public class RpnPrinter : IExprVisitor<string>
+  public class RpnPrinter : IAstVisitor<string>
   {
     public string Print(Expr expr)
     {
       return expr.accept<string>(this);
     }
 
-    public string visitBinaryExpr(Binary expr)
+    public string visitBinary(Binary expr)
     {
       return parenthesize(expr.oper.Lexeme, new List<Expr> { expr.left, expr.right });
     }
 
-    public string visitGroupingExpr(Grouping expr)
+    public string visitExpression(Expression expr)
+    {
+      throw new NotImplementedException();
+    }
+
+    public string visitGrouping(Grouping expr)
     {
       return parenthesize("group", new List<Expr> { expr.expression });
     }
 
-    public string visitLiteralExpr(Literal expr)
+    public string visitLiteral(Literal expr)
     {
       if (expr.objValue == null)
       {
@@ -34,12 +39,17 @@ namespace SeeSharp.Tools
       }
     }
 
-    public string visitTernaryExpr(Ternary expr)
+    public string visitPrint(Print expr)
+    {
+      throw new NotImplementedException();
+    }
+
+    public string visitTernary(Ternary expr)
     {
       return $"{expr.ifExpr.accept(this)} ? {expr.thenExpr.accept(this)} : {expr.elseExpr.accept(this)}";
     }
 
-    public string visitUnaryExpr(Unary expr)
+    public string visitUnary(Unary expr)
     {
       return parenthesize(expr.oper.Lexeme, new List<Expr> { expr.right });
     }

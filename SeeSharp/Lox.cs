@@ -1,4 +1,4 @@
-﻿using SeeSharp.Expressions;
+﻿using SeeSharp.AstDefinitions;
 using SeeSharp.Tools;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,9 @@ namespace SeeSharp
 {
   class Lox
   {
-    static bool hadError = false;
+    private static bool hadError = false;
+    private static bool hadRuntimeError = false;
+    private static Interpreter interpreter { get; } = new Interpreter();
 
     public static void RunFile(string path)
     {
@@ -21,6 +23,10 @@ namespace SeeSharp
       if (hadError)
       {
         Environment.Exit(65);
+      }
+      if(hadRuntimeError)
+      {
+        Environment.Exit(70);
       }
     }
 
@@ -45,7 +51,7 @@ namespace SeeSharp
 
       if (hadError) return;
 
-      Console.WriteLine(new RpnPrinter().Print(expression));
+      interpreter.interpret(expression);
     }
 
     public static void Error(int line, string message)
@@ -63,6 +69,12 @@ namespace SeeSharp
       {
         report(token.Line, $" at '{token.Lexeme}'", message);
       }
+    }
+
+    public static void RuntimeError(RuntimeError error)
+    {
+      Console.WriteLine($"{error.Message} \n[line {error.token.Line}]");
+      hadRuntimeError = true;
     }
 
     private static void report(int line, string where, string message)

@@ -1,4 +1,4 @@
-﻿using SeeSharp.Expressions;
+﻿using SeeSharp.AstDefinitions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace SeeSharp
       {
         return expression();
       }
-      catch(ParseError e)
+      catch(ParseError)
       {
         return null;
       }

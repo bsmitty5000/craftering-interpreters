@@ -1,5 +1,0 @@
-Binary   : Expr left, Token oper, Expr right
-Grouping : Expr expression
-Literal  : Object objValue
-Unary    : Token oper, Expr right
-Ternary  : Expr ifExpr, Expr thenExpr, Expr elseExpr

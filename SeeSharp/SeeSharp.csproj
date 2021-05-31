@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <Target Name="GenerateExpressions" BeforeTargets="BeforeBuild">
-    <Exec Command="py -3.9 ../ExpGenerator/ExpGenerator.py" />
+    <Exec Command="py -3.9 ../AstGenerator/AstGenerator.py" />
     <ItemGroup>
       <Compile Include="**/*$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**;@(Compile)" />
     </ItemGroup>

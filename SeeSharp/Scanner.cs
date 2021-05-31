@@ -203,8 +203,11 @@ namespace SeeSharp
             // because peek was used above we need to consume the final '"'
             advance();
 
-            // Plus/Minus one for each pointer to trim the quotes
-            string value = Source.Substring(start + 1, (current - start) - 1);
+            // (start + 1) to start after the first quote
+            // ((current - start) - 2) so neither quotes are included
+            // !! Different than Crafting Interpreters since c# Substring
+            // is Substring(start, length) vs Java's substring(start, end)
+            string value = Source.Substring(start + 1, (current - start) - 2);
             addToken(TokenType.STRING, value);
         }
 

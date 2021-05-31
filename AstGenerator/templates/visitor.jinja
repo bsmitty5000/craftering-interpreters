@@ -1,0 +1,11 @@
+using System;
+
+namespace SeeSharp.AstDefinitions
+{
+  public interface IAstVisitor<T>
+  {
+	{% for astName in astNames %}
+    T visit{{ astName }}{{ astType }}({{ astName }} expr);
+	{% endfor %}
+  }
+}
