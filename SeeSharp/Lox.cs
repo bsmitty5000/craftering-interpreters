@@ -51,7 +51,7 @@ namespace SeeSharp
 
       if (hadError) return;
 
-      //interpreter.interpret(expression);
+      interpreter.interpret(statements);
     }
 
     public static void Error(int line, string message)

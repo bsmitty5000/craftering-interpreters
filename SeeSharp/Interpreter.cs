@@ -18,21 +18,29 @@ namespace SeeSharp
     }
 
   }
-  public class Interpreter : IExprVisitor<Object>
+  public class Interpreter : IExprVisitor<Object>, IStmtVisitor<int>
   {
 
-    public void interpret(Expr expr)
+    public void interpret(List<Stmt> statements)
     {
       try
       {
-        Object val = evaluate(expr);
-        Console.WriteLine(stringify(val));
+        foreach(var stmt in statements)
+        {
+          execute(stmt);
+        }
       }
       catch(RuntimeError e)
       {
         Lox.RuntimeError(e);
       }
     }
+
+    private void execute(Stmt statement)
+    {
+      statement.accept<int>(this);
+    }
+
     public object visitBinaryExpr(Binary expr)
     {
       Object left = evaluate(expr.left);
@@ -111,8 +119,6 @@ namespace SeeSharp
       {
         return evaluate(expr.elseExpr);
       }
-
-
     }
 
     public object visitUnaryExpr(Unary expr)
@@ -132,14 +138,17 @@ namespace SeeSharp
       return null;
     }
 
-    public object visitExpression(Expression expr)
+    public int visitExpressionStmt(Expression expr)
     {
-      throw new NotImplementedException();
+      evaluate(expr.expression);
+      return 0;
     }
 
-    public object visitPrint(Print expr)
+    public int visitPrintStmt(Print expr)
     {
-      throw new NotImplementedException();
+      Object value = evaluate(expr.expression);
+      Console.WriteLine(stringify(value));
+      return 0;
     }
 
     #region Utilities
