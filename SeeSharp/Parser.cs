@@ -24,7 +24,7 @@ namespace SeeSharp
       List<Stmt> statements = new List<Stmt>();
       while(!isAtEnd())
       {
-        statements.Add(statement());
+        statements.Add(declaration());
       }
 
       return statements;
@@ -52,6 +52,41 @@ namespace SeeSharp
      */
 
     private delegate Expr ruleDelegate();
+
+    // declaration -> varDecl | statement
+    private Stmt declaration()
+    {
+      try
+      {
+        if (match(new List<TokenType>() { TokenType.VAR }))
+        {
+          return varDecl();
+        }
+
+        return statement();
+      }
+      catch(ParseError)
+      {
+        synchronize();
+        return null;
+      }
+    }
+
+    // varDecl 	->	"var" IDENTIFIER ( "=" expression )? ";" ; 
+    private Stmt varDecl()
+    {
+      Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+      Expr initializer = null;
+      if(match(new List<TokenType>() { TokenType.EQUAL }))
+      {
+        initializer = expression();
+      }
+
+      consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+
+      return new Var(name, initializer);
+    }
 
     // statement -> exprStmt | printStmt
     private Stmt statement()
@@ -140,7 +175,12 @@ namespace SeeSharp
       return primary();
     }
 
-    // primary  -> NUMBER | STRING | "true" | "false" | "nil"  | "(" expression ")" ;
+    /*
+     primary        -> 	"true" | "false" | "nil"
+					              | NUMBER | STRING
+					              | "(" expression ")"
+					              | IDENTIFIER;
+    */
     private Expr primary()
     {
       if(match(new List<TokenType>() { TokenType.FALSE }))
@@ -159,6 +199,11 @@ namespace SeeSharp
       if (match(new List<TokenType>() { TokenType.NUMBER, TokenType.STRING }))
       {
         return new Literal(previous().Literal);
+      }
+
+      if(match(new List<TokenType>() { TokenType.IDENTIFIER }))
+      {
+        return new Variable(previous());
       }
 
       if(match(new List<TokenType>() { TokenType.LEFT_PAREN }))

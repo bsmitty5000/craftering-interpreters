@@ -3,5 +3,7 @@ Expr;	Grouping;		Expr expression
 Expr;	Literal;		Object objValue
 Expr;	Unary;			Token oper, Expr right
 Expr;	Ternary;		Expr ifExpr, Expr thenExpr, Expr elseExpr
+Expr;	Variable;		Token name
 Stmt;	Expression;		Expr expression
 Stmt;	Print;			Expr expression
+Stmt;	Var;			Token name, Expr initializer
