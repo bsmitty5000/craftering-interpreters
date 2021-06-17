@@ -53,6 +53,8 @@ namespace SeeSharp
 
     private delegate Expr ruleDelegate();
 
+    // declaration & varDecl are broken up because we can't have varDecl in some places we have
+    // declarations
     // declaration -> varDecl | statement
     private Stmt declaration()
     {
@@ -96,7 +98,25 @@ namespace SeeSharp
         return printStatement();
       }
 
+      if(match(new List<TokenType>() { TokenType.LEFT_BRACE }))
+      {
+        return new Block(block());
+      }
       return expressionStatement();
+    }
+
+    private List<Stmt> block()
+    {
+      List<Stmt> statements = new List<Stmt>();
+
+      while(!check(TokenType.RIGHT_BRACE) && !isAtEnd())
+      {
+        statements.Add(declaration());
+      }
+
+      consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+
+      return statements;
     }
 
     // printStatement -> "print" expression ";"
@@ -118,7 +138,29 @@ namespace SeeSharp
     // expression -> equality ;
     private Expr expression()
     {
-      return ternary();
+      return assignment();
+    }
+
+    // assignment	->	IDENTIFIER "=" assignment | equality ;
+    private Expr assignment()
+    {
+      Expr expr = ternary();
+
+      if (match(new List<TokenType>() { TokenType.EQUAL }))
+      {
+        Token equals = previous();
+        Expr value = assignment();
+
+        if(expr is Variable)
+        {
+          Token name = ((Variable)expr).name;
+          return new Assign(name, value);
+        }
+
+        error(equals, "Invalid assignment target.");
+      }
+
+      return expr;
     }
 
     // ternary		->	equality ("?" expression ":" ternary)? ;

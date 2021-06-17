@@ -4,6 +4,8 @@ Expr;	Literal;		Object objValue
 Expr;	Unary;			Token oper, Expr right
 Expr;	Ternary;		Expr ifExpr, Expr thenExpr, Expr elseExpr
 Expr;	Variable;		Token name
+Expr;	Assign;			Token name, Expr value
 Stmt;	Expression;		Expr expression
 Stmt;	Print;			Expr expression
 Stmt;	Var;			Token name, Expr initializer
+Stmt; Block;    List<Stmt> statements

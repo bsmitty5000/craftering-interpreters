@@ -12,6 +12,11 @@ namespace SeeSharp.Tools
       return expr.accept<string>(this);
     }
 
+    public string visitAssignExpr(Assign expr)
+    {
+      throw new NotImplementedException();
+    }
+
     public string visitBinaryExpr(Binary expr)
     {
       return parenthesize(expr.oper.Lexeme, new List<Expr> { expr.left, expr.right });
@@ -43,6 +48,11 @@ namespace SeeSharp.Tools
     public string visitUnaryExpr(Unary expr)
     {
       return parenthesize(expr.oper.Lexeme, new List<Expr> { expr.right });
+    }
+
+    public string visitVariableExpr(Variable expr)
+    {
+      throw new NotImplementedException();
     }
 
     private String parenthesize(String name, List<Expr> exprs)

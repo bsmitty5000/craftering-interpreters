@@ -19,6 +19,7 @@ namespace SeeSharp
   }
   public class Interpreter : IExprVisitor<Object>, IStmtVisitor<int>
   {
+    private VarEnvironment environment = new VarEnvironment();
 
     public void interpret(List<Stmt> statements)
     {
@@ -38,6 +39,24 @@ namespace SeeSharp
     private void execute(Stmt statement)
     {
       statement.accept<int>(this);
+    }
+
+    private void executeBlock(List<Stmt> statements, VarEnvironment environment)
+    {
+      VarEnvironment previous = this.environment;
+      try
+      {
+        this.environment = environment;
+
+        foreach (var stmt in statements)
+        {
+          execute(stmt);
+        }
+      }
+      finally
+      {
+        this.environment = previous;
+      }
     }
 
     public object visitBinaryExpr(Binary expr)
@@ -137,6 +156,13 @@ namespace SeeSharp
       return null;
     }
 
+    public object visitAssignExpr(Assign expr)
+    {
+      Object value = evaluate(expr.value);
+      environment.assign(expr.name, value);
+      return value;
+    }
+
     public int visitExpressionStmt(Expression expr)
     {
       evaluate(expr.expression);
@@ -150,11 +176,36 @@ namespace SeeSharp
       return 0;
     }
 
+    public object visitVariableExpr(Variable expr)
+    {
+      return environment.get(expr.name);
+    }
+
+    public int visitVarStmt(Var expr)
+    {
+      object value = null;
+      if (expr.initializer != null)
+      {
+        value = evaluate(expr.initializer);
+      }
+
+      environment.define(expr.name.Lexeme, value);
+      return 0;
+    }
+
+
+    public int visitBlockStmt(Block expr)
+    {
+      executeBlock(expr.statements, new VarEnvironment(environment));
+      return 0;
+    }
     #region Utilities
     private object evaluate(Expr expr)
     {
       return expr.accept<object>(this);
     }
+
+
 
     private bool isEqual(Object a, Object b)
     {

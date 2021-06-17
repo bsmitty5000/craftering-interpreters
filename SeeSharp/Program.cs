@@ -5,10 +5,10 @@ using System.IO;
 
 namespace SeeSharp
 {
-    class Program
+  class Program
+  {
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
       if (args.Length > 1)
       {
         Console.WriteLine("Usage: SeeSharp [script]");
@@ -29,5 +29,5 @@ namespace SeeSharp
 
       //Console.WriteLine(new RpnPrinter().Print(expression));
     }
-    }
+  }
 }
