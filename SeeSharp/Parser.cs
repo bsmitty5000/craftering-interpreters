@@ -90,12 +90,29 @@ namespace SeeSharp
       return new Var(name, initializer);
     }
 
-    // statement -> exprStmt | printStmt
+    // statement      → exprStmt
+    //            | forStmt
+    //            | ifStmt
+    //            | printStmt
+    //            | whileStmt
+    //            | block ;
     private Stmt statement()
     {
-      if(match(new List<TokenType>() { TokenType.PRINT }))
+      if (match(new List<TokenType>() { TokenType.IF }))
+      {
+        return ifStatement();
+      }
+      if(match(new List<TokenType>() { TokenType.FOR }))
+      {
+        return forStatement();
+      }
+      if (match(new List<TokenType>() { TokenType.PRINT }))
       {
         return printStatement();
+      }
+      if(match(new List<TokenType>() { TokenType.WHILE }))
+      {
+        return whileStatement();
       }
 
       if(match(new List<TokenType>() { TokenType.LEFT_BRACE }))
@@ -119,12 +136,100 @@ namespace SeeSharp
       return statements;
     }
 
+    //forStmt       ->  "for" "(" (varDecl | exprStmt | ";" )
+    //              expression? ";"
+    //              expression? ")" statement ;
+    private Stmt forStatement()
+    {
+      consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+      Stmt initializer;
+      if(match(new List<TokenType>() { TokenType.SEMICOLON }))
+      {
+        initializer = null;
+      }
+      else if(match(new List<TokenType>() { TokenType.VAR }))
+      {
+        initializer = varDecl();
+      }
+      else
+      {
+        initializer = expressionStatement();
+      }
+
+      Expr condition = null;
+      if(!check(TokenType.SEMICOLON))
+      {
+        condition = expression();
+      }
+      consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+      Expr increment = null;
+      if(!check(TokenType.RIGHT_PAREN))
+      {
+        increment = expression();
+      }
+
+      consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses");
+
+      Stmt body = statement();
+
+      // if the increment is present add it to the end of the body
+      if(increment != null)
+      {
+        body = new Block(new List<Stmt>() { body, new Expression(increment) });
+      }
+
+      // the meat of this 'desugaring' is changing the for loop into a while loop
+      // and manually taking care of the increment & initializer
+      if(condition == null)
+      {
+        condition = new Literal(true);
+      }
+      body = new While(condition, body);
+
+      // if the initializer exists, add it as a statement to run
+      // once before the while loop runs
+      if(initializer != null)
+      {
+        body = new Block(new List<Stmt>() { initializer, body });
+      }
+      
+      return body;
+
+    }
+
     // printStatement -> "print" expression ";"
     private Stmt printStatement()
     {
       Expr value = expression();
       consume(TokenType.SEMICOLON, "Expect ';' after value.");
       return new Print(value);
+    }
+
+    //  ifStmt        ->  "if" "(" expression ")" statement
+     //                   ( "else" statement )? ;
+    private Stmt ifStatement()
+    {
+      consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'");
+      Expr condition = expression();
+      consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+      Stmt thenBranch = statement();
+      Stmt elseBranch = null;
+      if(match(new List<TokenType>() { TokenType.ELSE }))
+      {
+        elseBranch = statement();
+      }
+
+      return new If(condition, thenBranch, elseBranch);
+    }
+    // whileStmt     -> "while" "(" expression ")" statement ;
+    private Stmt whileStatement()
+    {
+      consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'");
+      Expr condition = expression();
+      consume(TokenType.RIGHT_PAREN, "Expect ')' after while statement.");
+      Stmt body = statement();
+      return new While(condition, body);
     }
 
     // expressionStatement -> expression ";"
@@ -141,10 +246,10 @@ namespace SeeSharp
       return assignment();
     }
 
-    // assignment	->	IDENTIFIER "=" assignment | equality ;
+    // assignment	->	IDENTIFIER "=" assignment | logic_or ;
     private Expr assignment()
     {
-      Expr expr = ternary();
+      Expr expr = or();
 
       if (match(new List<TokenType>() { TokenType.EQUAL }))
       {
@@ -158,6 +263,36 @@ namespace SeeSharp
         }
 
         error(equals, "Invalid assignment target.");
+      }
+
+      return expr;
+    }
+
+    // logic_or    ->  logic_and( "or" logic_and)* ;
+    private Expr or()
+    {
+      Expr expr = and();
+
+      while (match(new List<TokenType>() { TokenType.OR }))
+      {
+        Token oper = previous();
+        Expr right = and();
+        expr = new Logical(expr, oper, right);
+      }
+
+      return expr;
+    }
+
+    // logic_and   ->  ternary ( "and" ternary)* ;
+    private Expr and()
+    {
+      Expr expr = ternary();
+
+      while (match(new List<TokenType>() { TokenType.AND }))
+      {
+        Token oper = previous();
+        Expr right = ternary();
+        expr = new Logical(expr, oper, right);
       }
 
       return expr;

@@ -40,6 +40,11 @@ namespace SeeSharp.Tools
       }
     }
 
+    public string visitLogicalExpr(Logical expr)
+    {
+      throw new NotImplementedException();
+    }
+
     public string visitTernaryExpr(Ternary expr)
     {
       return $"{expr.ifExpr.accept(this)} ? {expr.thenExpr.accept(this)} : {expr.elseExpr.accept(this)}";

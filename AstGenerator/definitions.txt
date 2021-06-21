@@ -1,4 +1,5 @@
 Expr;	Binary;			Expr left, Token oper, Expr right
+Expr;	Logical;			Expr left, Token oper, Expr right
 Expr;	Grouping;		Expr expression
 Expr;	Literal;		Object objValue
 Expr;	Unary;			Token oper, Expr right
@@ -9,3 +10,5 @@ Stmt;	Expression;		Expr expression
 Stmt;	Print;			Expr expression
 Stmt;	Var;			Token name, Expr initializer
 Stmt; Block;    List<Stmt> statements
+Stmt; If;       Expr condition, Stmt thenBranch, Stmt elseBranch
+Stmt; While;    Expr condition, Stmt body

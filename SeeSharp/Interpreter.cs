@@ -193,19 +193,67 @@ namespace SeeSharp
       return 0;
     }
 
+    public int visitIfStmt(If expr)
+    {
+      if (isTruthy(evaluate(expr.condition)))
+      {
+        execute(expr.thenBranch);
+      }
+      else
+      {
+        execute(expr.elseBranch);
+      }
+      return 0;
+    }
+    public int visitWhileStmt(While expr)
+    {
+      while(isTruthy(evaluate(expr.condition)))
+      {
+        execute(expr.body);
+      }
+
+      return 0;
+    }
 
     public int visitBlockStmt(Block expr)
     {
       executeBlock(expr.statements, new VarEnvironment(environment));
       return 0;
     }
+
+    public object visitLogicalExpr(Logical expr)
+    {
+      Object left = evaluate(expr.left);
+
+      if(expr.oper.Type == TokenType.OR)
+      {
+        // short circuiting by returning left expr value if true
+        // in case of OR or if false in the case of AND and only
+        // evaluating right side when needed
+        if(isTruthy(left))
+        {
+          return left;
+        }
+      }
+      else
+      {
+        if(!isTruthy(left))
+        {
+          return left;
+        }
+      }
+
+      // lox returns a value with truthiness instead of 'true' or 'false'
+      // so if we make it here then we know the final evaluation of the entire
+      // expression will depend on the right side (b/c of the short circuit above)
+      return evaluate(expr.right);
+    }
+
     #region Utilities
     private object evaluate(Expr expr)
     {
       return expr.accept<object>(this);
     }
-
-
 
     private bool isEqual(Object a, Object b)
     {
@@ -274,6 +322,7 @@ namespace SeeSharp
 
       return o.ToString();
     }
+
 
     #endregion
   }
